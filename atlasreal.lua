@@ -12,7 +12,7 @@ local RemoteEvents = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEv
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
 
--- CUSTOM UI LIBRARY WITH ENHANCED STYLING
+-- CUSTOM UI LIBRARY WITH ENHANCED STYLING AND FUNCTIONALITY
 local CustomUI = {}
 CustomUI.__index = CustomUI
 
@@ -42,7 +42,7 @@ function CustomUI.new(name)
     shadow.ScaleType = Enum.ScaleType.Slice
     shadow.SliceCenter = Rect.new(10, 10, 118, 118)
 
-    -- Enhanced UI Control Buttons with hover effects
+    -- Enhanced UI Control Buttons with hover effects and additional functionality
     local closeButton = Instance.new("TextButton", self.mainFrame)
     closeButton.Size = UDim2.new(0, 30, 0, 30)
     closeButton.Position = UDim2.new(1, -35, 0, 10)
@@ -52,12 +52,14 @@ function CustomUI.new(name)
     closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
     closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     closeButton.MouseEnter:Connect(function()
-        closeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+        TS:Create(closeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(200, 0, 0)}):Play()
     end)
     closeButton.MouseLeave:Connect(function()
-        closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        TS:Create(closeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 0, 0)}):Play()
     end)
     closeButton.MouseButton1Click:Connect(function()
+        TS:Create(self.window, TweenInfo.new(0.5), {Transparency = 0}):Play()
+        wait(0.5)
         self.window:Destroy()
     end)
 
@@ -70,13 +72,20 @@ function CustomUI.new(name)
     minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
     minimizeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
     minimizeButton.MouseEnter:Connect(function()
-        minimizeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 0)
+        TS:Create(minimizeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(200, 200, 0)}):Play()
     end)
     minimizeButton.MouseLeave:Connect(function()
-        minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+        TS:Create(minimizeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 255, 0)}):Play()
     end)
     minimizeButton.MouseButton1Click:Connect(function()
         self.mainFrame.Visible = false
+        minimizeButton.Position = UDim2.new(0.5, -15, 0.5, -15) -- Center minimize button
+        minimizeButton.Text = "□"
+        minimizeButton.MouseButton1Click:Connect(function()
+            self.mainFrame.Visible = true
+            minimizeButton.Position = UDim2.new(1, -70, 0, 10) -- Reset minimize button position
+            minimizeButton.Text = "─"
+        end)
     end)
 
     local fullscreenButton = Instance.new("TextButton", self.mainFrame)
@@ -88,17 +97,16 @@ function CustomUI.new(name)
     fullscreenButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
     fullscreenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     fullscreenButton.MouseEnter:Connect(function()
-        fullscreenButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        TS:Create(fullscreenButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 200, 0)}):Play()
     end)
     fullscreenButton.MouseLeave:Connect(function()
-        fullscreenButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        TS:Create(fullscreenButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 255, 0)}):Play()
     end)
     fullscreenButton.MouseButton1Click:Connect(function()
-        self.mainFrame.Size = UDim2.new(1, 0, 1, 0)
-        self.mainFrame.Position = UDim2.new(0, 0, 0, 0)
+        TS:Create(self.mainFrame, TweenInfo.new(0.5), {Size = UDim2.new(1, 0, 1, 0), Position = UDim2.new(0, 0, 0, 0)}):Play()
     end)
 
-    -- Draggable UI with improved responsiveness
+    -- Draggable UI with improved responsiveness and added transparency effect on drag
     local dragging
     local dragInput
     local dragStart
@@ -134,6 +142,23 @@ function CustomUI.new(name)
             update(input)
         end
     end)
+
+    -- Additional feature: Theme support for dynamic UI appearance changes
+    self.theme = "Dark" -- Default theme
+    function self:SetTheme(themeName)
+        if themeName == "Light" then
+            self.mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            closeButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+            minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 100)
+            fullscreenButton.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+        elseif themeName == "Dark" then
+            self.mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+            fullscreenButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        end
+        self.theme = themeName
+    end
 
     return self
 end
